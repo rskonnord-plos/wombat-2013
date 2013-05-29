@@ -1,8 +1,12 @@
 package org.ambraproject.wombat.config;
 
 import com.google.common.base.Strings;
+import com.google.common.io.Files;
 import com.google.gson.GsonBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -15,6 +19,8 @@ import java.net.URL;
  */
 public class RuntimeConfiguration {
 
+  private static final Logger log = LoggerFactory.getLogger(RuntimeConfiguration.class);
+
   /**
    * @deprecated should only be called reflectively by Gson
    */
@@ -25,6 +31,7 @@ public class RuntimeConfiguration {
   // Fields are immutable by convention. They should be modified only during deserialization.
   private String server;
   private Boolean trustUnsignedServer;
+  private String localFrontEndPath;
 
   /**
    * Validate values after deserializing.
@@ -63,6 +70,29 @@ public class RuntimeConfiguration {
     } catch (MalformedURLException e) {
       throw new IllegalStateException("Invalid URL should have been caught at validation", e);
     }
+  }
+
+  /**
+   * Get the local file system path at which this webapp may cache front-end data downloaded from the service API. If
+   * none is provided in the config file, defaults to a system-provided temporary directory.
+   *
+   * @return the path
+   */
+  public File getLocalFrontEndPath() {
+    if (localFrontEndPath == null) {
+      File tempDir = Files.createTempDir();
+      log.warn("Using temporary directory as default for localFrontEndPath: {}", tempDir.getAbsolutePath());
+      return tempDir;
+    }
+
+    File path = new File(localFrontEndPath);
+    if (!path.exists()) {
+      throw new RuntimeConfigurationException("Path does not exist: " + localFrontEndPath);
+    }
+    if (!path.isDirectory()) {
+      throw new RuntimeConfigurationException("Path is not a directory: " + localFrontEndPath);
+    }
+    return path;
   }
 
   /*

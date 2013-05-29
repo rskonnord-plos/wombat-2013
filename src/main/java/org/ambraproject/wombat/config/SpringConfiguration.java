@@ -4,6 +4,7 @@ import com.google.common.io.Closeables;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import org.ambraproject.wombat.FrontEndBundle;
 import org.ambraproject.wombat.service.SoaService;
 import org.ambraproject.wombat.service.SoaServiceImpl;
 import org.springframework.context.annotation.Bean;
@@ -51,6 +52,11 @@ public class SpringConfiguration {
   @Bean
   public SoaService soaService() {
     return new SoaServiceImpl();
+  }
+
+  @Bean
+  public FrontEndBundle frontEndBundle() {
+    return new FrontEndBundle();
   }
 
 }

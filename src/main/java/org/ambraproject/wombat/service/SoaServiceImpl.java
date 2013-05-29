@@ -82,6 +82,9 @@ public class SoaServiceImpl implements SoaService {
     } finally {
       closer.close();
     }
+    if (responseObject == null) {
+      throw new IOException("Empty response");
+    }
     return responseObject;
   }
 
